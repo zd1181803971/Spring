@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx
+        https://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--DataSource： 使用Spring的数据源替换Mybatis的配置  c3po dbcp druid
+        我们这里使用Spring提供的JDBC
+    -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/mybatis?characterEncoding=utf8"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="root"></property>
+    </bean>
+
+    <!--SqlSessionFactory-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <!--绑定Mybatis配置文件-->
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <property name="mapperLocations" value="classpath:com/dzu/mapper/UserMapper.xml"></property>
+    </bean>
+
+    <!--SqlSessionTemplate: 就是我们使用的SqlSession-->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory"></constructor-arg>
+    </bean>
+
+ <!--配置声明式事务-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--<constructor-arg ref="dataSource"></constructor-arg>-->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!--结合AOP实现事务的织入-->
+    <!--配置事务通知；-->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <!--给哪些方法配置事务-->
+        <!--配置事务的传播特性： new propagation默认REQUIRED-->
+        <tx:attributes>
+            <tx:method name="add" propagation="REQUIRED"/>
+            <tx:method name="del" propagation="REQUIRED"/>
+            <tx:method name="query" read-only="true"/>
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--配置事务切入-->
+    <aop:config>
+        <aop:pointcut id="txPointcut" expression="execution(* com.dzu.mapper.*.*(..))"></aop:pointcut>
+
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"></aop:advisor>
+    </aop:config>
+</beans>

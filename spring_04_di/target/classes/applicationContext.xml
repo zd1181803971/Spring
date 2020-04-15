@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="address" class="com.dzu.pojo.Address">
+        <property name="address" value="ShanDong"></property>
+    </bean>
+    <bean id="student" class="com.dzu.pojo.Student">
+        <property name="name" value="zd"></property>
+        <property name="address" ref="address"></property>
+        <property name="books">
+            <list>
+                <value>java</value>
+                <value>go</value>
+                <value>c</value>
+            </list>
+        </property>
+        <property name="card">
+            <map>
+                <entry key="ID" value="11111111"></entry>
+                <entry key="银行" value="2222222"></entry>
+            </map>
+        </property>
+        <property name="games">
+            <set>
+                <value>LOL</value>
+                <value>BOB</value>
+                <value>SOS</value>
+            </set>
+        </property>
+        <property name="wife">
+            <null></null>
+        </property>
+        <property name="info">
+            <props>
+                <prop key="username">fxf</prop>
+                <prop key="url">qqqqqq</prop>
+                <prop key="password">chidapi</prop>
+            </props>
+        </property>
+    </bean>
+
+
+
+</beans>
